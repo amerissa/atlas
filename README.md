@@ -29,6 +29,7 @@ password=admin
 
 clustername=amer
 
+hdfsnameservice=hdfs://localhost.localdomain:8020
 
 [properties]
 

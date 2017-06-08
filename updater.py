@@ -99,11 +99,10 @@ def proceessattribute(entitytype, updateProperty, FQDN, GUIid, newValue):
     if not checkattribute(entitytype, updateProperty):
        print "Attribute %s for %s does not exist in Atlas" % (updateProperty, FQDN)
     else:
-      #  if updateProperty == "EnterpriseBusinessGlossaryTerm":
-      #      if not IGCRest(newValue):
-      #          failedupdates += 1
-      #          print "Failed to update property %s for %s. Reason: It does not Exist in IGC" % (updateProperty, FQDN)
-      #          return False
+        if updateProperty == IGCAttribute:
+            if IGCSync == True:
+                if not processIGC(newValue, entitytype, FQDN, GUIid):
+                    return False
         properties = getProperties(GUIid)
         if newValue.isdigit():
             newValue = int(newValue)
@@ -119,6 +118,21 @@ def proceessattribute(entitytype, updateProperty, FQDN, GUIid, newValue):
                 print "Updated property %s for %s" % (updateProperty, FQDN)
                 successfulupdates += 1
 
+def processIGC(newValue, entitytype, FQDN, GUID):
+    global failedupdates
+    global successfulupdates
+    if not IGCCheck(newValue):
+        failedupdates += 1
+        print "Failed to update property %s for %s. Reason: It does not Exist in IGC" % (IGCAttribute, FQDN)
+        return False
+    else:
+        if not checkattribute(entitytype, IGCAttribute + "Definition"):
+            createattribute(entitytype, IGCAttribute + "Definition")
+        arguments = {'types' : 'term', 'text' : '"' +  newValue + '"', 'search-properties' : 'name'}
+        IGCid = IGCRest("search", arguments)['items'][0]['_id']
+        shortdescription = IGCRest("assets/" + IGCid)["short_description"]
+        proceessattribute(entitytype, IGCAttribute + "Definition", FQDN, GUID, shortdescription)
+        return True
 
 def createattribute(entitytype, attribute) :
     instance = { "name" : attribute, "dataTypeName": "string", "multiplicity": "optional", "isComposite": False, "isUnique": False, "isIndexable": True, "reverseAttributeName": None}
@@ -129,13 +143,16 @@ def createattribute(entitytype, attribute) :
     definition = definition.pop("definition")
     post = atlasPOST( "PUT" ,"/api/atlas/types", json.dumps(definition))
 
-def IGCRest(newValue):
+def IGCRest(path, arguments=''):
+    results = json.loads(requests.get(IGC + path, auth=(IGCUser, IGCPassword), verify=False, params=arguments).text)
+    return(results)
+
+def IGCCheck(newValue):
     arguments = {'types' : 'term', 'text' : '"' +  newValue + '"', 'search-properties' : 'name'}
-    results = json.loads(requests.get(IGC, auth=(IGCUser, IGCPassowrd), verify=False, params=arguments).text)['items']
+    results = IGCRest("search", arguments)["items"]
     for result in results:
         for category in result["_context"]:
-            if "Scotiabank Enterprise Business Glossary" == category['_name']:
-                print "found it"
+            if IGCRootGlossary == category['_name']:
                 return True
             else:
                 return False
@@ -194,6 +211,13 @@ CLUSTERNAME=settings.get('atlas', 'clustername')
 dynamic=settings.getboolean('properties','createAttributeDynamically')
 jsonfile=settings.get('properties', 'jsonFile')
 
+#IGC
+IGC=settings.get('IGC', 'IGC')
+IGCUser=settings.get('IGC', 'IGCUser')
+IGCPassword=settings.get('IGC', 'IGCPassword')
+IGCSync=settings.getboolean('IGC','IGCSync')
+IGCAttribute=settings.get('IGC', 'IGCAttribute')
+IGCRootGlossary=settings.get('IGC', 'IGCRootGlossary')
 
 #CHECK IF ATLAS IS UP
 try:

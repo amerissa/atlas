@@ -25,8 +25,7 @@
       "name" : "emp_no",
       "attributes" : [
         {"BusinessDescription" : "test1"},
-        {"EnterpriseBusinessGlossaryTerm" : "test"},
-        {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
+        {"EnterpriseBusinessGlossaryTerm" : "Address"},
         {"comment" : "test"},
         {"description" : "test"}],
       "tags" : ["testnew"]
@@ -36,7 +35,6 @@
     "attributes" : [
       {"BusinessDescription" : "test1"},
       {"EnterpriseBusinessGlossaryTerm" : "test"},
-      {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
       {"comment" : "test"},
       {"description" : "test"}],
     "tags" : ["amer"]
@@ -63,7 +61,6 @@
       "attributes" : [
         {"BusinessDescription" : "test"},
         {"EnterpriseBusinessGlossaryTerm" : "test"},
-        {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
         {"comment" : "test"},
         {"description" : "test"}],
       "tags" : ["testnew"]
@@ -73,7 +70,6 @@
     "attributes" : [
       {"BusinessDescription" : "test1"},
       {"EnterpriseBusinessGlossaryTerm" : "test"},
-      {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
       {"comment" : "test"},
       {"description" : "test"}],
     "tags" : ["amer"]

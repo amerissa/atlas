@@ -1,15 +1,16 @@
 {
-"dbname" : "employees",
+"name" : "employees",
+"type" : "hive",
 "attributes": [
-  { "Zone" : "test" },
-  {"description" : "test" } ],
+  { "Zone" : "test1" },
+  {"description" : "test1" } ],
 "tags" : [ "testnew" ],
 "tables" : [
   {
     "name" : "salaries",
     "attributes" : [
-      {"BusinessFullDesc" : "test"},
-      {"BusinessShortDesc" : "test"},
+      {"BusinessFullDesc" : "test1"},
+      {"BusinessShortDesc" : "test1"},
       {"ConfidentialityClassifcation" : "test"},
       {"CountryOfOrigin" : "test"},
       {"DataOwner" : "test"},
@@ -23,7 +24,7 @@
       {
       "name" : "emp_no",
       "attributes" : [
-        {"BusinessDescription" : "test"},
+        {"BusinessDescription" : "test1"},
         {"EnterpriseBusinessGlossaryTerm" : "test"},
         {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
         {"comment" : "test"},
@@ -33,7 +34,7 @@
     {
     "name" : "salary",
     "attributes" : [
-      {"BusinessDescription" : "test"},
+      {"BusinessDescription" : "test1"},
       {"EnterpriseBusinessGlossaryTerm" : "test"},
       {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
       {"comment" : "test"},
@@ -45,7 +46,7 @@
   {
     "name" : "employees",
     "attributes" : [
-      {"BusinessFullDesc" : "test"},
+      {"BusinessFullDesc" : "test1"},
       {"BusinessShortDesc" : "test"},
       {"ConfidentialityClassifcation" : "test"},
       {"CountryOfOrigin" : "test"},
@@ -70,7 +71,7 @@
     {
     "name" : "salary",
     "attributes" : [
-      {"BusinessDescription" : "test"},
+      {"BusinessDescription" : "test1"},
       {"EnterpriseBusinessGlossaryTerm" : "test"},
       {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
       {"comment" : "test"},

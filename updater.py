@@ -6,29 +6,6 @@ from ConfigParser import SafeConfigParser
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-failedupdates = 0
-successfulupdates = 0
-settings = SafeConfigParser()
-
-try:
-    configfile=sys.argv[1]
-except IndexError:
-    print "Provide config file location"
-    sys.exit(1)
-
-settings.read(configfile)
-
-### Atlas Environment variables
-ATLAS_PORT=settings.get('atlas', 'port')
-ATLAS_DOMAIN=settings.get('atlas', 'host')
-USERNAME=settings.get('atlas', 'username')
-PASSWORD=settings.get('atlas', 'password')
-CLUSTERNAME=settings.get('atlas', 'clustername')
-
-dynamic=settings.getboolean('properties','createAttributeDynamically')
-jsonfile=settings.get('properties', 'jsonFile')
-
-
 
 def atlasREST( restAPI ) :
     url = "http://"+ATLAS_DOMAIN+":"+ATLAS_PORT+restAPI
@@ -41,15 +18,15 @@ def atlasPOST( method, restAPI, data) :
     return (json.loads(r.text));
 
 def atlascheck():
-    try:
-        atlasREST("/api/atlas/types")
-    except:
-        print "Cannot connect to Atlas: possibly username and password are wrong"
-        sys.exit(1)
     url = "http://" + ATLAS_DOMAIN + ":" + ATLAS_PORT + "/api/atlas/admin/status"
     status = requests.get(url, auth=(USERNAME, PASSWORD))
     if status.status_code == 200:
         if json.loads(status.text)["Status"] == "ACTIVE":
+            try:
+                atlasREST("/api/atlas/types")
+            except:
+                print "Cannot connect to Atlas: possibly username and password are wrong"
+                sys.exit(1)
             return True
         else:
             print "Atlas Health is " + status["Status"]
@@ -129,6 +106,11 @@ def proceessattribute(entitytype, updateProperty, FQDN, GUIid, newValue):
     if not checkattribute(entitytype, updateProperty):
        print "Attribute %s for %s does not exist in Atlas" % (updateProperty, FQDN)
     else:
+      #  if updateProperty == "EnterpriseBusinessGlossaryTerm":
+      #      if not IGCRest(newValue):
+      #          failedupdates += 1
+      #          print "Failed to update property %s for %s. Reason: It does not Exist in IGC" % (updateProperty, FQDN)
+      #          return False
         properties = getProperties(GUIid)
         if newValue.isdigit():
             newValue = int(newValue)
@@ -154,6 +136,70 @@ def createattribute(hivetype, attribute) :
     definition = definition.pop("definition")
     post = atlasPOST( "PUT" ,"/api/atlas/types", json.dumps(definition))
 
+def IGCRest(newValue):
+    arguments = {'types' : 'term', 'text' : '"' +  newValue + '"', 'search-properties' : 'name'}
+    results = json.loads(requests.get(IGC, auth=(IGCUser, IGCPassowrd), verify=False, params=arguments).text)['items']
+    for result in results:
+        for category in result["_context"]:
+            if "Scotiabank Enterprise Business Glossary" == category['_name']:
+                print "found it"
+                return True
+            else:
+                return False
+
+def updater(data, entitytype, parententity=''):
+    name = data["name"]
+    FQDN = '.'.join(filter(None, [parententity, name + '@' + CLUSTERNAME]))
+    if not checkentityexists(entitytype, FQDN):
+        return False
+    else:
+        GUIid = getGID(entitytype, FQDN)
+        for property in data["attributes"]:
+            for updateProperty, newValue in property.items():
+                proceessattribute(entitytype, updateProperty, FQDN, GUIid, newValue)
+        for tag in data["tags"]:
+            processtag(tag, GUIid, FQDN)
+        return True
+
+def hive(jsondata):
+    if updater(jsondata, "hive_db"):
+        for table in jsondata["tables"]:
+            if updater(table, "hive_table",  jsondata["name"]):
+                for column in table['columns']:
+                    updater(column, "hive_column", jsondata["name"] + '.' + table["name"])
+
+def results():
+    if failedupdates == 0 and successfulupdates == 0:
+        print "Nothing To Update"
+    else:
+        print "Finished Updating. Successful: %s. Failed: %s." % (successfulupdates, failedupdates)
+
+####################################################
+
+failedupdates = 0
+successfulupdates = 0
+
+#Read Config File
+
+try:
+    configfile=sys.argv[1]
+except IndexError:
+    print "Provide config file location"
+    sys.exit(1)
+
+settings = SafeConfigParser()
+
+settings.read(configfile)
+
+### Atlas Environment variables
+ATLAS_PORT=settings.get('atlas', 'port')
+ATLAS_DOMAIN=settings.get('atlas', 'host')
+USERNAME=settings.get('atlas', 'username')
+PASSWORD=settings.get('atlas', 'password')
+CLUSTERNAME=settings.get('atlas', 'clustername')
+
+dynamic=settings.getboolean('properties','createAttributeDynamically')
+jsonfile=settings.get('properties', 'jsonFile')
 
 #CHECK IF ATLAS IS UP
 try:
@@ -169,50 +215,7 @@ except:
     print "File does not exist or not accesiable"
     sys.exit(1)
 
-
-db = jsondata["dbname"]
-dbFQDN = "%s@%s" % (db, CLUSTERNAME)
-
-if not checkentityexists("hive_db", dbFQDN):
-    print "Database %s does not exit. Not continuing" % (dbFQDN)
-    sys.exit(1)
-
-dbGUIid = getGID("hive_db", dbFQDN)
-
-for property in jsondata["attributes"]:
-    for updateProperty, newValue in property.items():
-        proceessattribute("hive_db", updateProperty, dbFQDN, dbGUIid, newValue)
-for tag in jsondata["tags"]:
-    processtag(tag, dbGUIid, dbFQDN)
-
-for table in jsondata["tables"]:
-    tablename = table["name"]
-    tableFQDN = "%s.%s@%s" % (db, tablename, CLUSTERNAME)
-    if not checkentityexists("hive_table", tableFQDN):
-        print "Table %s does not exit. Moving to next table" % (tableFQDN)
-        continue
-    else:
-        tableGUIid = getGID("hive_table", tableFQDN)
-        for property in table["attributes"]:
-            for updateProperty, newValue in property.items():
-                proceessattribute("hive_table", updateProperty, tableFQDN, tableGUIid, newValue)
-        for tag in table["tags"]:
-            processtag(tag, tableGUIid, tableFQDN)
-        for column in table['columns']:
-            columnname = column["name"]
-            columnFQDN = "%s.%s.%s@%s" % (db, tablename, columnname, CLUSTERNAME)
-            if not checkentityexists("hive_column", columnFQDN):
-                print "Column %s does not exit. Moving to next column" % (columnFQDN)
-                continue
-            else:
-                columnGUIid = getGID("hive_column", columnFQDN)
-                for property in column["attributes"]:
-                    for updateProperty, newValue in property.iteritems():
-                        proceessattribute("hive_column", updateProperty, columnFQDN, columnGUIid, newValue)
-                for tag in column["tags"]:
-                    processtag(tag, columnGUIid, columnFQDN)
-
-if failedupdates == 0 and successfulupdates == 0:
-    print "Nothing To Update"
-else:
-    print "Finished Updating. Successful: %s. Failed: %s." % (successfulupdates, failedupdates)
+#Run Logic
+if jsondata["type"] == "hive":
+    hive(jsondata)
+results()

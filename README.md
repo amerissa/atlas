@@ -5,7 +5,15 @@ Update script will populate Atlas with attributes. You can add custom attributes
 
 IGC Integration will check if term is present in IGC and associate term as an attribute in Atlas and include the definition of the term as  an extra attribute 
 
-Currently it is limited to hive, other services will be added later on. 
+For hive updates:
+specify type as hive in JSON
+
+For hdfs updates:
+specify type as hdfs in JSON
+
+For custom types:
+specify type as the type in JSON
+specify name as the fully qualified name in JSON
 
 Hive Integration will iterate over tables and columns. One JSON input per database. 
 

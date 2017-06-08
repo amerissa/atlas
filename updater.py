@@ -245,7 +245,10 @@ if jsondata["type"] == "hive":
 elif jsondata["type"] == "hdfs":
     hdfs(jsondata)
 else:
-    print "Type %s is not supported" % (jsondata["type"])
-    sys.exist(1)
+    if jsondata["type"] in atlasREST("/api/atlas/types)["results"]
+        updater(jsondata, jsondata["type"], jsondata["name"])
+    else:
+        print "Type %s is not supported" % (jsondata["type"])
+        sys.exist(1)
 
 results()

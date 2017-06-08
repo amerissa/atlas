@@ -157,9 +157,7 @@ def IGCCheck(newValue):
             else:
                 return False
 
-def updater(data, entitytype, parententity=''):
-    name = data["name"]
-    FQDN = '.'.join(filter(None, [parententity, name + '@' + CLUSTERNAME]))
+def updater(data, entitytype, FQDN):
     if not checkentityexists(entitytype, FQDN):
         return False
     else:
@@ -172,11 +170,18 @@ def updater(data, entitytype, parententity=''):
         return True
 
 def hive(jsondata):
-    if updater(jsondata, "hive_db"):
+    FQDN = jsondata["name"] + "@" + CLUSTERNAME
+    if updater(jsondata, "hive_db", FQDN):
         for table in jsondata["tables"]:
-            if updater(table, "hive_table",  jsondata["name"]):
+            tableFQDN = jsondata["name"] + '.' + table["name"] + "@" + CLUSTERNAME
+            if updater(table, "hive_table",  tableFQDN):
                 for column in table['columns']:
-                    updater(column, "hive_column", jsondata["name"] + '.' + table["name"])
+                    columnFQDN = jsondata["name"] + '.' + table["name"] + '.' + column["name"] +  "@" + CLUSTERNAME
+                    updater(column, "hive_column", columnFQDN)
+
+def hdfs(jsondata):
+    FQDN = hdfsnameservice + jsondata["name"]
+    updater(jsondata, "hdfs_path", FQDN)
 
 def results():
     if failedupdates == 0 and successfulupdates == 0:
@@ -207,6 +212,7 @@ ATLAS_DOMAIN=settings.get('atlas', 'host')
 USERNAME=settings.get('atlas', 'username')
 PASSWORD=settings.get('atlas', 'password')
 CLUSTERNAME=settings.get('atlas', 'clustername')
+hdfsnameservice=settings.get('atlas', 'hdfsnameservice')
 
 dynamic=settings.getboolean('properties','createAttributeDynamically')
 jsonfile=settings.get('properties', 'jsonFile')
@@ -236,4 +242,10 @@ except:
 #Run Logic
 if jsondata["type"] == "hive":
     hive(jsondata)
+elif jsondata["type"] == "hdfs":
+    hdfs(jsondata)
+else:
+    print "Type %s is not supported" % (jsondata["type"])
+    sys.exist(1)
+
 results()

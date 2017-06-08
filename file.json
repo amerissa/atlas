@@ -1,0 +1,80 @@
+{
+"dbname" : "employees",
+"attributes": [
+  { "Zone" : "test" },
+  {"description" : "test" } ],
+"tags" : [ "testnew" ],
+"tables" : [
+  {
+    "name" : "salaries",
+    "attributes" : [
+      {"BusinessFullDesc" : "test"},
+      {"BusinessShortDesc" : "test"},
+      {"ConfidentialityClassifcation" : "test"},
+      {"CountryOfOrigin" : "test"},
+      {"DataOwner" : "test"},
+      {"FeedCode" : "test"},
+      {"FeedName" : "test"},
+      {"description" : "test"},
+      {"Frequency" : "test"},
+      {"comment" : "test"}],
+    "tags" : ["testnew"],
+    "columns" : [
+      {
+      "name" : "emp_no",
+      "attributes" : [
+        {"BusinessDescription" : "test"},
+        {"EnterpriseBusinessGlossaryTerm" : "test"},
+        {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
+        {"comment" : "test"},
+        {"description" : "test"}],
+      "tags" : ["testnew"]
+    },
+    {
+    "name" : "salary",
+    "attributes" : [
+      {"BusinessDescription" : "test"},
+      {"EnterpriseBusinessGlossaryTerm" : "test"},
+      {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
+      {"comment" : "test"},
+      {"description" : "test"}],
+    "tags" : ["amer"]
+    }
+    ]
+  },
+  {
+    "name" : "employees",
+    "attributes" : [
+      {"BusinessFullDesc" : "test"},
+      {"BusinessShortDesc" : "test"},
+      {"ConfidentialityClassifcation" : "test"},
+      {"CountryOfOrigin" : "test"},
+      {"DataOwner" : "test"},
+      {"FeedCode" : "test"},
+      {"FeedName" : "test"},
+      {"description" : "test"},
+      {"Frequency" : "test"},
+      {"comment" : "test"}],
+    "tags" : ["testnew"],
+    "columns" : [
+      {
+      "name" : "emp_no",
+      "attributes" : [
+        {"BusinessDescription" : "test"},
+        {"EnterpriseBusinessGlossaryTerm" : "test"},
+        {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
+        {"comment" : "test"},
+        {"description" : "test"}],
+      "tags" : ["testnew"]
+    },
+    {
+    "name" : "salary",
+    "attributes" : [
+      {"BusinessDescription" : "test"},
+      {"EnterpriseBusinessGlossaryTerm" : "test"},
+      {"EnterpriseBusinessGlossaryTermDefinition" : "test"},
+      {"comment" : "test"},
+      {"description" : "test"}],
+    "tags" : ["amer"]
+    }
+ ] } ] }

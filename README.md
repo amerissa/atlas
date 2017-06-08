@@ -16,29 +16,53 @@ Config File
 -------------
 
 [atlas]
+
 //Setup connection to Atlas
+
 port=21000
+
 host=localhost.localdomain
+
 username=admin
+
 password=admin
+
 clustername=amer
 
+hdfsnameservice=hdfs://localhost.localdomain:8020
+
 [properties]
-//setting it to true will create attributes and tags if they do not exist
+
+#setting it to true will create attributes and tags if they do not exist
+
 createAttributeDynamically=True
+
 jsonFile=file.json
 
 
+
 [IGC]
-//Enable Sync from IGC
+
+#Enable Sync from IGC
+
 IGCSync=True
-//Attribute to read and check whether it exists in IGC. The definition will be added under eg EnterpriseBusinessGlossaryTermDefinition
+
+#Attribute to read and check whether it exists in IGC. The definition will be added under eg
+
+EnterpriseBusinessGlossaryTermDefinition
+
 IGCAttribute=EnterpriseBusinessGlossaryTerm
-//Parent Category to search Under
+
+#Parent Category to search Under
+
 IGCRootGlossary=Enterprise Business Glossary
-//IGC Connection Info
+
+#IGC Connection Info
+
 IGC=https://localhost.localdomain:9443/ibm/iis/igc-rest/v1/
+
 IGCUser=guest
+
 IGCPassword=Password1
 
 

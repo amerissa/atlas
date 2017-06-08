@@ -32,10 +32,11 @@ def atlascheck():
             print "Atlas Health is " + status["Status"]
             return False
     else:
+        sys.exit(1)
         return False
 
-def checkentityexists(hivetype, FQDN) :
-    entity=atlasREST("/api/atlas/entities?type=%s&property=qualifiedName&value=%s" % (hivetype, FQDN))
+def checkentityexists(entitytype, FQDN) :
+    entity=atlasREST("/api/atlas/entities?type=%s&property=qualifiedName&value=%s" % (entitytype, FQDN))
     for key, value in entity.items():
         if key == "error":
             print "Cannot update " + FQDN + " Reason: " + value
@@ -45,8 +46,8 @@ def checkentityexists(hivetype, FQDN) :
         else:
             return True
 
-def getGID(hivetype, FQDN) :
-    entity=atlasREST("/api/atlas/entities?type=%s&property=qualifiedName&value=%s" % (hivetype, FQDN))
+def getGID(entitytype, FQDN) :
+    entity=atlasREST("/api/atlas/entities?type=%s&property=qualifiedName&value=%s" % (entitytype, FQDN))
     GUIid=entity['definition']['id']['id']
     return(GUIid)
 
@@ -54,23 +55,15 @@ def getProperties(GUIid) :
     properties=atlasREST("/api/atlas/entities/%s" %  (GUIid))
     return(properties)
 
-def hivetype(database, table, column) :
-     if column and table and database:
-        type = 'hive_column'
-     elif table and database:
-        type = 'hive_table'
-     else:
-        type = 'hive_db'
-     return(type)
 
-def checkattribute(hivetype, attribute) :
-    list = atlasREST("/api/atlas/types/%s?type=entity" % (hivetype))["definition"]["classTypes"][0]
+def checkattribute(entitytype, attribute) :
+    list = atlasREST("/api/atlas/types/%s?type=entity" % (entitytype))["definition"]["classTypes"][0]
     attributes = [ item["name"] for item in list["attributeDefinitions"] ]
     if attribute in attributes or attribute == "description":
         return True
     else:
        if dynamic == True:
-           createattribute(hivetype, attribute)
+           createattribute(entitytype, attribute)
            return True
        else:
            return False
@@ -127,9 +120,9 @@ def proceessattribute(entitytype, updateProperty, FQDN, GUIid, newValue):
                 successfulupdates += 1
 
 
-def createattribute(hivetype, attribute) :
+def createattribute(entitytype, attribute) :
     instance = { "name" : attribute, "dataTypeName": "string", "multiplicity": "optional", "isComposite": False, "isUnique": False, "isIndexable": True, "reverseAttributeName": None}
-    definition = atlasREST("/api/atlas/types/%s" % (hivetype))
+    definition = atlasREST("/api/atlas/types/%s" % (entitytype))
     del definition["requestId"]
     del definition["typeName"]
     definition["definition"]["classTypes"][0]["attributeDefinitions"].append(instance)
@@ -200,6 +193,7 @@ CLUSTERNAME=settings.get('atlas', 'clustername')
 
 dynamic=settings.getboolean('properties','createAttributeDynamically')
 jsonfile=settings.get('properties', 'jsonFile')
+
 
 #CHECK IF ATLAS IS UP
 try:

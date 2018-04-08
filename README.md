@@ -81,7 +81,7 @@ IGCPassword=Password1
 JSON Structure
 -------------------
 Sample JSON:
-
+```json
 {
 "name" : "DATABASENAME",
 "type" : "hive",
@@ -149,4 +149,4 @@ Sample JSON:
     "tags" : ["amer"]
     }
  ] } ] }
-
+```

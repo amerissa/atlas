@@ -101,7 +101,7 @@ Sample JSON:
       "name" : "emp_no",
       "attributes" : [
         {"BusinessDescription" : "test1"},
-        {"EnterpriseBusinessGlossaryTerm" : "Address"},
+        {"EnterpriseBusinessGlossaryTerm" : "Address"}],
       "tags" : ["testnew"]
     },
     {

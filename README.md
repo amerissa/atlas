@@ -22,7 +22,7 @@ Hive Integration will iterate over tables and columns. One JSON input per databa
 
 Config File
 -------------
-
+```ini
 [atlas]
 
 //Setup connection to Atlas
@@ -73,7 +73,7 @@ IGCUser=guest
 
 IGCPassword=Password1
 
-
+```
 
 ----------
 
